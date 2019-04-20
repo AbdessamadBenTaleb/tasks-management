@@ -41,7 +41,8 @@ public class TaskIndexer extends BaseIndexer<Task>{
 	}
 
 	@Override
-	protected Summary doGetSummary(Document document, Locale locale, String snippet, PortletRequest portletRequest,
+	protected Summary doGetSummary(Document document, Locale locale, 
+			String snippet, PortletRequest portletRequest,
 			PortletResponse portletResponse) throws Exception {
 		// TODO Auto-generated method stub
 		return null;

@@ -84,6 +84,18 @@ public class TaskLocalServiceUtil {
 		return getService().addTask(task);
 	}
 
+	public static gr.confinanz.tasks.management.model.Task addTask(
+		long userId, java.lang.String title, java.lang.String description,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		long taskUserId, boolean completed,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addTask(userId, title, description, expirationDateMonth,
+			expirationDateDay, expirationDateYear, taskUserId, completed,
+			serviceContext);
+	}
+
 	/**
 	* Creates a new task with the primary key. Does not add the task to the database.
 	*
@@ -172,6 +184,19 @@ public class TaskLocalServiceUtil {
 		return getService().updateTask(task);
 	}
 
+	public static gr.confinanz.tasks.management.model.Task updateTask(
+		long userId, long taskId, java.lang.String title,
+		java.lang.String description, int expirationDateMonth,
+		int expirationDateDay, int expirationDateYear, long taskUserId,
+		boolean completed,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateTask(userId, taskId, title, description,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			taskUserId, completed, serviceContext);
+	}
+
 	/**
 	* Returns the number of tasks.
 	*
@@ -179,6 +204,14 @@ public class TaskLocalServiceUtil {
 	*/
 	public static int getTasksCount() {
 		return getService().getTasksCount();
+	}
+
+	public static int getTasksCount(long companyId, long groupId) {
+		return getService().getTasksCount(companyId, groupId);
+	}
+
+	public static int getTasksCount(long companyId, long groupId, int status) {
+		return getService().getTasksCount(companyId, groupId, status);
 	}
 
 	/**
@@ -256,6 +289,16 @@ public class TaskLocalServiceUtil {
 		return getService().getTasks(start, end);
 	}
 
+	public static java.util.List<gr.confinanz.tasks.management.model.Task> getTasks(
+		long companyId, long groupId, int start, int end) {
+		return getService().getTasks(companyId, groupId, start, end);
+	}
+
+	public static java.util.List<gr.confinanz.tasks.management.model.Task> getTasks(
+		long companyId, long groupId, int status, int start, int end) {
+		return getService().getTasks(companyId, groupId, status, start, end);
+	}
+
 	/**
 	* Returns all the tasks matching the UUID and company.
 	*
@@ -308,6 +351,16 @@ public class TaskLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
+	}
+
+	public static void deleteGroupTasks(long companyId, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deleteGroupTasks(companyId, groupId);
+	}
+
+	public static void deleteUserTasks(long companyId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deleteUserTasks(companyId, userId);
 	}
 
 	public static TaskLocalService getService() {

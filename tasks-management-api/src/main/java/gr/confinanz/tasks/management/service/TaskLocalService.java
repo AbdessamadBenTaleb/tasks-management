@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -95,6 +96,12 @@ public interface TaskLocalService extends BaseLocalService,
 	*/
 	@Indexable(type = IndexableType.REINDEX)
 	public Task addTask(Task task);
+
+	public Task addTask(long userId, java.lang.String title,
+		java.lang.String description, int expirationDateMonth,
+		int expirationDateDay, int expirationDateYear, long taskUserId,
+		boolean completed, ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	* Creates a new task with the primary key. Does not add the task to the database.
@@ -167,6 +174,12 @@ public interface TaskLocalService extends BaseLocalService,
 	@Indexable(type = IndexableType.REINDEX)
 	public Task updateTask(Task task);
 
+	public Task updateTask(long userId, long taskId, java.lang.String title,
+		java.lang.String description, int expirationDateMonth,
+		int expirationDateDay, int expirationDateYear, long taskUserId,
+		boolean completed, ServiceContext serviceContext)
+		throws PortalException;
+
 	/**
 	* Returns the number of tasks.
 	*
@@ -174,6 +187,12 @@ public interface TaskLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getTasksCount();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getTasksCount(long companyId, long groupId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getTasksCount(long companyId, long groupId, int status);
 
 	/**
 	* Returns the OSGi service identifier.
@@ -235,6 +254,13 @@ public interface TaskLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Task> getTasks(int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Task> getTasks(long companyId, long groupId, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Task> getTasks(long companyId, long groupId, int status,
+		int start, int end);
+
 	/**
 	* Returns all the tasks matching the UUID and company.
 	*
@@ -278,4 +304,10 @@ public interface TaskLocalService extends BaseLocalService,
 	*/
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
 		Projection projection);
+
+	public void deleteGroupTasks(long companyId, long groupId)
+		throws PortalException;
+
+	public void deleteUserTasks(long companyId, long userId)
+		throws PortalException;
 }

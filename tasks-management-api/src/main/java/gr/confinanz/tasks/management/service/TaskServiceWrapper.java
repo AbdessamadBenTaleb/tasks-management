@@ -32,6 +32,52 @@ public class TaskServiceWrapper implements TaskService,
 		_taskService = taskService;
 	}
 
+	@Override
+	public gr.confinanz.tasks.management.model.Task addTask(
+		java.lang.String title, java.lang.String description,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		long taskUserId, boolean completed,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _taskService.addTask(title, description, expirationDateMonth,
+			expirationDateDay, expirationDateYear, taskUserId, completed,
+			serviceContext);
+	}
+
+	@Override
+	public gr.confinanz.tasks.management.model.Task deleteTask(long taskId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _taskService.deleteTask(taskId);
+	}
+
+	@Override
+	public gr.confinanz.tasks.management.model.Task getTask(long taskId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _taskService.getTask(taskId);
+	}
+
+	@Override
+	public gr.confinanz.tasks.management.model.Task updateTask(long taskId,
+		java.lang.String title, java.lang.String description,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		long taskUserId, boolean completed,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _taskService.updateTask(taskId, title, description,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			taskUserId, completed, serviceContext);
+	}
+
+	@Override
+	public int getTasksCount(long companyId, long groupId) {
+		return _taskService.getTasksCount(companyId, groupId);
+	}
+
+	@Override
+	public int getTasksCount(long companyId, long groupId, int status) {
+		return _taskService.getTasksCount(companyId, groupId, status);
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -40,6 +86,18 @@ public class TaskServiceWrapper implements TaskService,
 	@Override
 	public java.lang.String getOSGiServiceIdentifier() {
 		return _taskService.getOSGiServiceIdentifier();
+	}
+
+	@Override
+	public java.util.List<gr.confinanz.tasks.management.model.Task> getTasks(
+		long companyId, long groupId, int start, int end) {
+		return _taskService.getTasks(companyId, groupId, start, end);
+	}
+
+	@Override
+	public java.util.List<gr.confinanz.tasks.management.model.Task> getTasks(
+		long companyId, long groupId, int status, int start, int end) {
+		return _taskService.getTasks(companyId, groupId, status, start, end);
 	}
 
 	@Override

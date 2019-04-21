@@ -41,6 +41,47 @@ public class TaskServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link gr.confinanz.tasks.management.service.impl.TaskServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static gr.confinanz.tasks.management.model.Task addTask(
+		java.lang.String title, java.lang.String description,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		long taskUserId, boolean completed,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addTask(title, description, expirationDateMonth,
+			expirationDateDay, expirationDateYear, taskUserId, completed,
+			serviceContext);
+	}
+
+	public static gr.confinanz.tasks.management.model.Task deleteTask(
+		long taskId) throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deleteTask(taskId);
+	}
+
+	public static gr.confinanz.tasks.management.model.Task getTask(long taskId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getTask(taskId);
+	}
+
+	public static gr.confinanz.tasks.management.model.Task updateTask(
+		long taskId, java.lang.String title, java.lang.String description,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		long taskUserId, boolean completed,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateTask(taskId, title, description, expirationDateMonth,
+			expirationDateDay, expirationDateYear, taskUserId, completed,
+			serviceContext);
+	}
+
+	public static int getTasksCount(long companyId, long groupId) {
+		return getService().getTasksCount(companyId, groupId);
+	}
+
+	public static int getTasksCount(long companyId, long groupId, int status) {
+		return getService().getTasksCount(companyId, groupId, status);
+	}
 
 	/**
 	* Returns the OSGi service identifier.
@@ -49,6 +90,16 @@ public class TaskServiceUtil {
 	*/
 	public static java.lang.String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
+	}
+
+	public static java.util.List<gr.confinanz.tasks.management.model.Task> getTasks(
+		long companyId, long groupId, int start, int end) {
+		return getService().getTasks(companyId, groupId, start, end);
+	}
+
+	public static java.util.List<gr.confinanz.tasks.management.model.Task> getTasks(
+		long companyId, long groupId, int status, int start, int end) {
+		return getService().getTasks(companyId, groupId, status, start, end);
 	}
 
 	public static TaskService getService() {

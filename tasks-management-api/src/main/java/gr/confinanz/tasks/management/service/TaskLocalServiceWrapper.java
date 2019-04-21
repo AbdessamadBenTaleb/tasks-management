@@ -82,6 +82,18 @@ public class TaskLocalServiceWrapper implements TaskLocalService,
 		return _taskLocalService.addTask(task);
 	}
 
+	@Override
+	public gr.confinanz.tasks.management.model.Task addTask(long userId,
+		java.lang.String title, java.lang.String description,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		long taskUserId, boolean completed,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _taskLocalService.addTask(userId, title, description,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			taskUserId, completed, serviceContext);
+	}
+
 	/**
 	* Creates a new task with the primary key. Does not add the task to the database.
 	*
@@ -176,6 +188,18 @@ public class TaskLocalServiceWrapper implements TaskLocalService,
 		return _taskLocalService.updateTask(task);
 	}
 
+	@Override
+	public gr.confinanz.tasks.management.model.Task updateTask(long userId,
+		long taskId, java.lang.String title, java.lang.String description,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		long taskUserId, boolean completed,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _taskLocalService.updateTask(userId, taskId, title, description,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			taskUserId, completed, serviceContext);
+	}
+
 	/**
 	* Returns the number of tasks.
 	*
@@ -184,6 +208,16 @@ public class TaskLocalServiceWrapper implements TaskLocalService,
 	@Override
 	public int getTasksCount() {
 		return _taskLocalService.getTasksCount();
+	}
+
+	@Override
+	public int getTasksCount(long companyId, long groupId) {
+		return _taskLocalService.getTasksCount(companyId, groupId);
+	}
+
+	@Override
+	public int getTasksCount(long companyId, long groupId, int status) {
+		return _taskLocalService.getTasksCount(companyId, groupId, status);
 	}
 
 	/**
@@ -266,6 +300,18 @@ public class TaskLocalServiceWrapper implements TaskLocalService,
 		return _taskLocalService.getTasks(start, end);
 	}
 
+	@Override
+	public java.util.List<gr.confinanz.tasks.management.model.Task> getTasks(
+		long companyId, long groupId, int start, int end) {
+		return _taskLocalService.getTasks(companyId, groupId, start, end);
+	}
+
+	@Override
+	public java.util.List<gr.confinanz.tasks.management.model.Task> getTasks(
+		long companyId, long groupId, int status, int start, int end) {
+		return _taskLocalService.getTasks(companyId, groupId, status, start, end);
+	}
+
 	/**
 	* Returns all the tasks matching the UUID and company.
 	*
@@ -321,6 +367,18 @@ public class TaskLocalServiceWrapper implements TaskLocalService,
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return _taskLocalService.dynamicQueryCount(dynamicQuery, projection);
+	}
+
+	@Override
+	public void deleteGroupTasks(long companyId, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_taskLocalService.deleteGroupTasks(companyId, groupId);
+	}
+
+	@Override
+	public void deleteUserTasks(long companyId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_taskLocalService.deleteUserTasks(companyId, userId);
 	}
 
 	@Override

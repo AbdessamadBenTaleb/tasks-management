@@ -1,10 +1,11 @@
 Bundle-Name: tasks-management-api
 Bundle-SymbolicName: gr.confinanz.tasks.management.api
 Bundle-Version: 1.0.0
-Export-Package:\
+Export-Package: \
 	gr.confinanz.tasks.management.exception,\
 	gr.confinanz.tasks.management.model,\
 	gr.confinanz.tasks.management.service,\
-	gr.confinanz.tasks.management.service.persistence
+	gr.confinanz.tasks.management.service.persistence,\
+	gr.confinanz.tasks.management.constants
 -check: EXPORTS
 -includeresource: META-INF/service.xml=../tasks-management-service/service.xml

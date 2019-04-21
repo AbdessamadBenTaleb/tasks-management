@@ -1,0 +1,4 @@
+Bundle-Name: tasks-management-web
+Bundle-SymbolicName: gr.confinanz.tasks.management.web
+Bundle-Version: 1.0.0
+Export-Package: gr.confinanz.tasks.management.constants

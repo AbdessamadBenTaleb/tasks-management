@@ -14,8 +14,13 @@
 
 package gr.confinanz.tasks.management.service.impl;
 
-import aQute.bnd.annotation.ProviderType;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.service.ServiceContext;
 
+import java.util.List;
+
+import aQute.bnd.annotation.ProviderType;
+import gr.confinanz.tasks.management.model.Task;
 import gr.confinanz.tasks.management.service.base.TaskServiceBaseImpl;
 
 /**
@@ -34,9 +39,65 @@ import gr.confinanz.tasks.management.service.base.TaskServiceBaseImpl;
  */
 @ProviderType
 public class TaskServiceImpl extends TaskServiceBaseImpl {
-	/*
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link gr.confinanz.tasks.management.service.TaskServiceUtil} to access the task remote service.
-	 */
+	
+	
+	public Task addTask(
+			String title, String description, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear, long taskUserId,
+			boolean completed, ServiceContext serviceContext)
+		throws PortalException {
+
+		//TODO  check permission
+		return taskLocalService.addTask(
+			getUserId(), title, description, expirationDateMonth,
+			expirationDateDay, expirationDateYear, taskUserId, completed,
+			serviceContext);
+	}
+
+	public Task deleteTask(long taskId) throws PortalException {
+		// TODO check permission
+
+		return taskLocalService.deleteTask(taskId);
+	}
+
+	public Task getTask(long taskId) throws PortalException {
+		//TODO check permission 
+		return taskLocalService.getTask(taskId);
+	}
+
+	public List<Task> getTasks(
+		long companyId, long groupId, int start, int end) {
+
+		return taskPersistence.findByC_G(companyId, groupId, start, end);
+	}
+
+	public List<Task> getTasks(
+		long companyId, long groupId, int status, int start, int end) {
+
+		return taskPersistence.findByC_G_S(
+			companyId, groupId, status, start, end);
+	}
+
+	public int getTasksCount(long companyId, long groupId) {
+		return taskPersistence.countByC_G(companyId, groupId);
+	}
+
+	public int getTasksCount(long companyId, long groupId, int status) {
+		return taskPersistence.countByC_G_S(companyId, groupId, status);
+	}
+
+	public Task updateTask(
+			long taskId, String title, String description,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, long taskUserId, boolean completed,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		// TODO check permission
+
+		return taskLocalService.updateTask(
+			getUserId(), taskId, title, description, expirationDateMonth,
+			expirationDateDay, expirationDateYear, taskUserId, completed,
+			serviceContext);
+	}
 }

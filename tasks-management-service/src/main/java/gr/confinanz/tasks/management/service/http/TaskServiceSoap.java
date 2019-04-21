@@ -16,9 +16,16 @@ package gr.confinanz.tasks.management.service.http;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+
+import gr.confinanz.tasks.management.service.TaskServiceUtil;
+
+import java.rmi.RemoteException;
+
 /**
  * Provides the SOAP utility for the
- * {@link gr.confinanz.tasks.management.service.TaskServiceUtil} service utility. The
+ * {@link TaskServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -53,9 +60,139 @@ import aQute.bnd.annotation.ProviderType;
  * @author Abdessamad Ben Taleb
  * @see TaskServiceHttp
  * @see gr.confinanz.tasks.management.model.TaskSoap
- * @see gr.confinanz.tasks.management.service.TaskServiceUtil
+ * @see TaskServiceUtil
  * @generated
  */
 @ProviderType
 public class TaskServiceSoap {
+	public static gr.confinanz.tasks.management.model.TaskSoap addTask(
+		java.lang.String title, java.lang.String description,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		long taskUserId, boolean completed,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+		try {
+			gr.confinanz.tasks.management.model.Task returnValue = TaskServiceUtil.addTask(title,
+					description, expirationDateMonth, expirationDateDay,
+					expirationDateYear, taskUserId, completed, serviceContext);
+
+			return gr.confinanz.tasks.management.model.TaskSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static gr.confinanz.tasks.management.model.TaskSoap deleteTask(
+		long taskId) throws RemoteException {
+		try {
+			gr.confinanz.tasks.management.model.Task returnValue = TaskServiceUtil.deleteTask(taskId);
+
+			return gr.confinanz.tasks.management.model.TaskSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static gr.confinanz.tasks.management.model.TaskSoap getTask(
+		long taskId) throws RemoteException {
+		try {
+			gr.confinanz.tasks.management.model.Task returnValue = TaskServiceUtil.getTask(taskId);
+
+			return gr.confinanz.tasks.management.model.TaskSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static gr.confinanz.tasks.management.model.TaskSoap[] getTasks(
+		long companyId, long groupId, int start, int end)
+		throws RemoteException {
+		try {
+			java.util.List<gr.confinanz.tasks.management.model.Task> returnValue =
+				TaskServiceUtil.getTasks(companyId, groupId, start, end);
+
+			return gr.confinanz.tasks.management.model.TaskSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static gr.confinanz.tasks.management.model.TaskSoap[] getTasks(
+		long companyId, long groupId, int status, int start, int end)
+		throws RemoteException {
+		try {
+			java.util.List<gr.confinanz.tasks.management.model.Task> returnValue =
+				TaskServiceUtil.getTasks(companyId, groupId, status, start, end);
+
+			return gr.confinanz.tasks.management.model.TaskSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getTasksCount(long companyId, long groupId)
+		throws RemoteException {
+		try {
+			int returnValue = TaskServiceUtil.getTasksCount(companyId, groupId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getTasksCount(long companyId, long groupId, int status)
+		throws RemoteException {
+		try {
+			int returnValue = TaskServiceUtil.getTasksCount(companyId, groupId,
+					status);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static gr.confinanz.tasks.management.model.TaskSoap updateTask(
+		long taskId, java.lang.String title, java.lang.String description,
+		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
+		long taskUserId, boolean completed,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+		try {
+			gr.confinanz.tasks.management.model.Task returnValue = TaskServiceUtil.updateTask(taskId,
+					title, description, expirationDateMonth, expirationDateDay,
+					expirationDateYear, taskUserId, completed, serviceContext);
+
+			return gr.confinanz.tasks.management.model.TaskSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	private static Log _log = LogFactoryUtil.getLog(TaskServiceSoap.class);
 }

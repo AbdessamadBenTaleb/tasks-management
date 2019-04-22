@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-
 <model-hints>
 	<model name="gr.confinanz.tasks.management.model.Task">
 		<field name="uuid" type="String" />

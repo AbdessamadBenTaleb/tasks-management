@@ -1,5 +1,6 @@
-Bundle-Name: tasks-management-service
+Bundle-Name: TASKS MANAGEMENT SERVICE
 Bundle-SymbolicName: gr.confinanz.tasks.management.service
 Bundle-Version: 1.0.0
 Liferay-Require-SchemaVersion: 1.0.0
 Liferay-Service: true
+Export-Package: gr.confinanz.tasks.management.service.permission

@@ -110,10 +110,12 @@ public class TaskLocalServiceWrapper implements TaskLocalService,
 	*
 	* @param task the task
 	* @return the task that was removed
+	* @throws PortalException
 	*/
 	@Override
 	public gr.confinanz.tasks.management.model.Task deleteTask(
-		gr.confinanz.tasks.management.model.Task task) {
+		gr.confinanz.tasks.management.model.Task task)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _taskLocalService.deleteTask(task);
 	}
 
@@ -379,6 +381,16 @@ public class TaskLocalServiceWrapper implements TaskLocalService,
 	public void deleteUserTasks(long companyId, long userId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_taskLocalService.deleteUserTasks(companyId, userId);
+	}
+
+	@Override
+	public void updateAsset(long userId,
+		gr.confinanz.tasks.management.model.Task task, long[] assetCategoryIds,
+		java.lang.String[] assetTagNames, long[] assetLinkEntryIds,
+		java.lang.Double priority)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_taskLocalService.updateAsset(userId, task, assetCategoryIds,
+			assetTagNames, assetLinkEntryIds, priority);
 	}
 
 	@Override

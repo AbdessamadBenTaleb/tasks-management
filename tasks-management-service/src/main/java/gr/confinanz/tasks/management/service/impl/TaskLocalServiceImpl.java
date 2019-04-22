@@ -14,11 +14,19 @@
 
 package gr.confinanz.tasks.management.service.impl;
 
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetLinkConstants;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
+import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Calendar;
@@ -47,7 +55,8 @@ import gr.confinanz.tasks.management.service.base.TaskLocalServiceBaseImpl;
 @ProviderType
 public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 	
-	// TODO index ADD
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
 	public Task addTask(
 			long userId, String title, String description,
 			int expirationDateMonth, int expirationDateDay,
@@ -91,10 +100,25 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 		task.setCompleted(completed);
 
 		task = taskPersistence.update(task);
-		//TODO update Resources & Asset
+
+		// Resources
+
+		resourceLocalService.addResources(
+			task.getCompanyId(), task.getGroupId(), userId,
+			Task.class.getName(), task.getTaskId(), false, true, true);
+
+		// Asset
+
+		updateAsset(
+			userId, task, serviceContext.getAssetCategoryIds(),
+			serviceContext.getAssetTagNames(),
+			serviceContext.getAssetLinkEntryIds(),
+			serviceContext.getAssetPriority());
+
 		return task;
 	}
 
+	@Override
 	public void deleteGroupTasks(long companyId, long groupId)
 		throws PortalException {
 
@@ -111,11 +135,29 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 
 		return deleteTask(task);
 	}
-	// TODO delete Resources & asset & index
-	public Task deleteTask(Task task){
-		return taskPersistence.remove(task);
+
+	@Indexable(type = IndexableType.DELETE)
+	public Task deleteTask(Task task) throws PortalException {
+
+		// Task
+
+		taskPersistence.remove(task);
+
+		// Resources
+
+		resourceLocalService.deleteResource(
+			task.getCompanyId(), Task.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL, task.getTaskId());
+
+		// Asset
+
+		assetEntryLocalService.deleteEntry(
+			Task.class.getName(), task.getTaskId());
+
+		return task;
 	}
 
+	@Override
 	public void deleteUserTasks(long companyId, long userId)
 		throws PortalException {
 
@@ -137,12 +179,14 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 		return taskPersistence.findByPrimaryKey(taskId);
 	}
 
+	@Override
 	public List<Task> getTasks(
 		long companyId, long groupId, int start, int end) {
 
 		return taskPersistence.findByC_G(companyId, groupId, start, end);
 	}
 
+	@Override
 	public List<Task> getTasks(
 		long companyId, long groupId, int status, int start, int end) {
 
@@ -150,21 +194,53 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 			companyId, groupId, status, start, end);
 	}
 
-	
+	@Override
 	public int getTasksCount(long companyId, long groupId) {
 		return taskPersistence.countByC_G(companyId, groupId);
 	}
 
+	@Override
 	public int getTasksCount(long companyId, long groupId, int status) {
 		return taskPersistence.countByC_G_S(companyId, groupId, status);
 	}
 
+	public void updateAsset(
+			long userId, Task task, long[] assetCategoryIds,
+			String[] assetTagNames, long[] assetLinkEntryIds, Double priority)
+		throws PortalException {
+
+		boolean visible = false;
+
+		if (task.isApproved()) {
+			visible = true;
+		}
+
+		String summary = HtmlUtil.extractText(
+			StringUtil.shorten(task.getDescription(), 500));
+
+		AssetEntry assetEntry = assetEntryLocalService.updateEntry(
+			userId, task.getGroupId(), task.getCreateDate(),
+			task.getModifiedDate(), Task.class.getName(), task.getTaskId(),
+			task.getUuid(), 0, assetCategoryIds, assetTagNames, true, visible,
+			task.getCreateDate(), null, null, null, ContentTypes.TEXT_HTML,
+			task.getTitle(), task.getDescription(), summary, null, null, 0, 0,
+			priority);
+
+		assetLinkLocalService.updateLinks(
+			userId, assetEntry.getEntryId(), assetLinkEntryIds,
+			AssetLinkConstants.TYPE_RELATED);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
 	public Task updateTask(
 			long userId, long taskId, String title, String description,
 			int expirationDateMonth, int expirationDateDay,
 			int expirationDateYear, long taskUserId, boolean completed,
 			ServiceContext serviceContext)
 		throws PortalException {
+
+		// Task
 
 		userPersistence.findByPrimaryKey(userId);
 		Task task = taskPersistence.findByPrimaryKey(taskId);
@@ -196,17 +272,23 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 		task.setCompleted(completed);
 
 		task = taskPersistence.update(task);
-		
-		//TODO  updateAsset
-		
+
+		// Asset
+
+		updateAsset(
+			userId, task, serviceContext.getAssetCategoryIds(),
+			serviceContext.getAssetTagNames(),
+			serviceContext.getAssetLinkEntryIds(),
+			serviceContext.getAssetPriority());
+
 		return task;
 	}
-	
-	
+
 	protected void validate(String title) throws PortalException {
 		if (Validator.isNull(title)) {
 			throw new TaskTitleException();
 		}
 	}
+
 
 }

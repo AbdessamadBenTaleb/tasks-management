@@ -112,9 +112,11 @@ public class TaskLocalServiceUtil {
 	*
 	* @param task the task
 	* @return the task that was removed
+	* @throws PortalException
 	*/
 	public static gr.confinanz.tasks.management.model.Task deleteTask(
-		gr.confinanz.tasks.management.model.Task task) {
+		gr.confinanz.tasks.management.model.Task task)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteTask(task);
 	}
 
@@ -361,6 +363,16 @@ public class TaskLocalServiceUtil {
 	public static void deleteUserTasks(long companyId, long userId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().deleteUserTasks(companyId, userId);
+	}
+
+	public static void updateAsset(long userId,
+		gr.confinanz.tasks.management.model.Task task, long[] assetCategoryIds,
+		java.lang.String[] assetTagNames, long[] assetLinkEntryIds,
+		java.lang.Double priority)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService()
+			.updateAsset(userId, task, assetCategoryIds, assetTagNames,
+			assetLinkEntryIds, priority);
 	}
 
 	public static TaskLocalService getService() {

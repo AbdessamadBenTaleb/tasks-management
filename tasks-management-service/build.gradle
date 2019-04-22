@@ -12,6 +12,6 @@ dependencies {
 
 buildService {
 	apiDir = "../tasks-management-api/src/main/java"
+	osgiModule = true
+	propsUtil = "gr.confinanz.tasks.management.service.util.ServiceProps"
 }
-
-group = "gr.confinanz.tasks.management"

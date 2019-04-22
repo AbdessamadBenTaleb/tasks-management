@@ -20,8 +20,11 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import java.util.List;
 
 import aQute.bnd.annotation.ProviderType;
+import gr.confinanz.tasks.management.constants.ActionKeys;
 import gr.confinanz.tasks.management.model.Task;
 import gr.confinanz.tasks.management.service.base.TaskServiceBaseImpl;
+import gr.confinanz.tasks.management.service.permission.TaskPermissionChecker;
+import gr.confinanz.tasks.management.service.permission.TaskResourcePermissionChecker;
 
 /**
  * The implementation of the task remote service.
@@ -47,7 +50,10 @@ public class TaskServiceImpl extends TaskServiceBaseImpl {
 			boolean completed, ServiceContext serviceContext)
 		throws PortalException {
 
-		//TODO  check permission
+		TaskResourcePermissionChecker.check(
+				getPermissionChecker(), serviceContext.getScopeGroupId(),
+				ActionKeys.ADD_TASK);
+		
 		return taskLocalService.addTask(
 			getUserId(), title, description, expirationDateMonth,
 			expirationDateDay, expirationDateYear, taskUserId, completed,
@@ -55,13 +61,14 @@ public class TaskServiceImpl extends TaskServiceBaseImpl {
 	}
 
 	public Task deleteTask(long taskId) throws PortalException {
-		// TODO check permission
-
+		TaskPermissionChecker.check(
+				getPermissionChecker(), taskId, ActionKeys.DELETE);
 		return taskLocalService.deleteTask(taskId);
 	}
 
 	public Task getTask(long taskId) throws PortalException {
-		//TODO check permission 
+		TaskPermissionChecker.check(
+				getPermissionChecker(), taskId, ActionKeys.VIEW);
 		return taskLocalService.getTask(taskId);
 	}
 
@@ -93,7 +100,9 @@ public class TaskServiceImpl extends TaskServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		// TODO check permission
+
+		TaskPermissionChecker.check(
+			getPermissionChecker(), taskId, ActionKeys.UPDATE);
 
 		return taskLocalService.updateTask(
 			getUserId(), taskId, title, description, expirationDateMonth,

@@ -1,17 +1,12 @@
 <%@ include file="init.jsp" %>
 
-<p>
-	<b><liferay-ui:message key="tasksmanagement.caption"/></b>
-</p>
-
-
-	<aui:button-row>
+<aui:button-row>
 			<liferay-portlet:renderURL var="addTaskURL">
 				<liferay-portlet:param name="mvcPath" value="/edit_task.jsp" />
 				<liferay-portlet:param name="redirect" value="<%= currentURL %>" />
 			</liferay-portlet:renderURL>
 
-	<aui:button href="<%= addTaskURL %>" icon="icon-plus" value="add-task" />
+<aui:button href="<%= addTaskURL %>" icon="icon-plus" value="add-task" />
 		
 	</aui:button-row>
 	

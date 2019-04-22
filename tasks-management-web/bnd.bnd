@@ -1,4 +1,7 @@
-Bundle-Name: tasks-management-web
+Bundle-Name: TASKS MANAGEMENT WEB
 Bundle-SymbolicName: gr.confinanz.tasks.management.web
 Bundle-Version: 1.0.0
 Export-Package: gr.confinanz.tasks.management.constants
+Import-Package: \
+	gr.confinanz.tasks.management.service.permission,\
+	*

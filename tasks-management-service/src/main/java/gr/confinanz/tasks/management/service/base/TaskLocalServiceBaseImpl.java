@@ -133,10 +133,11 @@ public abstract class TaskLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param task the task
 	 * @return the task that was removed
+	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public Task deleteTask(Task task) {
+	public Task deleteTask(Task task) throws PortalException {
 		return taskPersistence.remove(task);
 	}
 

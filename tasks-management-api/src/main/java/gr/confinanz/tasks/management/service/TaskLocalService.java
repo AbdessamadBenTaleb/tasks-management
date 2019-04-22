@@ -97,6 +97,7 @@ public interface TaskLocalService extends BaseLocalService,
 	@Indexable(type = IndexableType.REINDEX)
 	public Task addTask(Task task);
 
+	@Indexable(type = IndexableType.REINDEX)
 	public Task addTask(long userId, java.lang.String title,
 		java.lang.String description, int expirationDateMonth,
 		int expirationDateDay, int expirationDateYear, long taskUserId,
@@ -116,9 +117,10 @@ public interface TaskLocalService extends BaseLocalService,
 	*
 	* @param task the task
 	* @return the task that was removed
+	* @throws PortalException
 	*/
 	@Indexable(type = IndexableType.DELETE)
-	public Task deleteTask(Task task);
+	public Task deleteTask(Task task) throws PortalException;
 
 	/**
 	* Deletes the task with the primary key from the database. Also notifies the appropriate model listeners.
@@ -174,6 +176,7 @@ public interface TaskLocalService extends BaseLocalService,
 	@Indexable(type = IndexableType.REINDEX)
 	public Task updateTask(Task task);
 
+	@Indexable(type = IndexableType.REINDEX)
 	public Task updateTask(long userId, long taskId, java.lang.String title,
 		java.lang.String description, int expirationDateMonth,
 		int expirationDateDay, int expirationDateYear, long taskUserId,
@@ -310,4 +313,8 @@ public interface TaskLocalService extends BaseLocalService,
 
 	public void deleteUserTasks(long companyId, long userId)
 		throws PortalException;
+
+	public void updateAsset(long userId, Task task, long[] assetCategoryIds,
+		java.lang.String[] assetTagNames, long[] assetLinkEntryIds,
+		java.lang.Double priority) throws PortalException;
 }

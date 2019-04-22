@@ -10,9 +10,15 @@
 		<field name="userName" type="String" />
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
-		<field name="title" type="String" />
-		<field name="description" type="String" />
-		<field name="expirationDate" type="Date" />
+		<field name="title" type="String">
+			<validator name="required" />
+		</field>
+		<field name="description" type="String">
+			<hint-collection name="TEXTAREA" />
+		</field>
+		<field name="expirationDate" type="Date">
+			<hint name="show-time">false</hint>
+		</field>
 		<field name="taskUserId" type="long" />
 		<field name="completed" type="boolean" />
 		<field name="status" type="int" />

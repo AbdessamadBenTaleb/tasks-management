@@ -17,11 +17,17 @@ page import="com.liferay.portal.kernel.service.UserServiceUtil" %><%@
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %>
+<%@page import="com.liferay.portal.kernel.util.WebKeys"%>
+
 
 <%@page import="gr.confinanz.tasks.management.service.TaskServiceUtil"%>
 <%@page import="gr.confinanz.tasks.management.model.Task"%>
 <%@page import="gr.confinanz.tasks.management.exception.TaskTitleException"%>
 <%@page import="gr.confinanz.tasks.management.constants.TasksManagementWebKeys"%>
+<%@page import="gr.confinanz.tasks.management.service.permission.TaskPermissionChecker"%>
+<%@page import="gr.confinanz.tasks.management.service.permission.TaskResourcePermissionChecker"%>
+<%@page import="gr.confinanz.tasks.management.constants.ActionKeys"%>
+
 
 
 <%@ page import="java.text.Format" %>

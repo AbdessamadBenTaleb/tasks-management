@@ -8,7 +8,7 @@ create table ABT_Task (
 	createDate DATE null,
 	modifiedDate DATE null,
 	title VARCHAR(75) null,
-	description VARCHAR(75) null,
+	description STRING null,
 	expirationDate DATE null,
 	taskUserId LONG,
 	completed BOOLEAN,

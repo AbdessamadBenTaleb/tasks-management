@@ -22,9 +22,11 @@ import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
@@ -1930,6 +1932,328 @@ public class TaskPersistenceImpl extends BasePersistenceImpl<Task>
 	}
 
 	/**
+	 * Returns all the tasks that the user has permission to view where companyId = &#63; and groupId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param groupId the group ID
+	 * @return the matching tasks that the user has permission to view
+	 */
+	@Override
+	public List<Task> filterFindByC_G(long companyId, long groupId) {
+		return filterFindByC_G(companyId, groupId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the tasks that the user has permission to view where companyId = &#63; and groupId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link TaskModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param groupId the group ID
+	 * @param start the lower bound of the range of tasks
+	 * @param end the upper bound of the range of tasks (not inclusive)
+	 * @return the range of matching tasks that the user has permission to view
+	 */
+	@Override
+	public List<Task> filterFindByC_G(long companyId, long groupId, int start,
+		int end) {
+		return filterFindByC_G(companyId, groupId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the tasks that the user has permissions to view where companyId = &#63; and groupId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link TaskModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param groupId the group ID
+	 * @param start the lower bound of the range of tasks
+	 * @param end the upper bound of the range of tasks (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching tasks that the user has permission to view
+	 */
+	@Override
+	public List<Task> filterFindByC_G(long companyId, long groupId, int start,
+		int end, OrderByComparator<Task> orderByComparator) {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return findByC_G(companyId, groupId, start, end, orderByComparator);
+		}
+
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByFields().length * 2));
+		}
+		else {
+			query = new StringBundler(5);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_TASK_WHERE);
+		}
+		else {
+			query.append(_FILTER_SQL_SELECT_TASK_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		query.append(_FINDER_COLUMN_C_G_COMPANYID_2);
+
+		query.append(_FINDER_COLUMN_C_G_GROUPID_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_TASK_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			if (getDB().isSupportsInlineDistinct()) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
+			}
+			else {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				query.append(TaskModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				query.append(TaskModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				Task.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN,
+				groupId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+
+			if (getDB().isSupportsInlineDistinct()) {
+				q.addEntity(_FILTER_ENTITY_ALIAS, TaskImpl.class);
+			}
+			else {
+				q.addEntity(_FILTER_ENTITY_TABLE, TaskImpl.class);
+			}
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(companyId);
+
+			qPos.add(groupId);
+
+			return (List<Task>)QueryUtil.list(q, getDialect(), start, end);
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	/**
+	 * Returns the tasks before and after the current task in the ordered set of tasks that the user has permission to view where companyId = &#63; and groupId = &#63;.
+	 *
+	 * @param taskId the primary key of the current task
+	 * @param companyId the company ID
+	 * @param groupId the group ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next task
+	 * @throws NoSuchTaskException if a task with the primary key could not be found
+	 */
+	@Override
+	public Task[] filterFindByC_G_PrevAndNext(long taskId, long companyId,
+		long groupId, OrderByComparator<Task> orderByComparator)
+		throws NoSuchTaskException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return findByC_G_PrevAndNext(taskId, companyId, groupId,
+				orderByComparator);
+		}
+
+		Task task = findByPrimaryKey(taskId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Task[] array = new TaskImpl[3];
+
+			array[0] = filterGetByC_G_PrevAndNext(session, task, companyId,
+					groupId, orderByComparator, true);
+
+			array[1] = task;
+
+			array[2] = filterGetByC_G_PrevAndNext(session, task, companyId,
+					groupId, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected Task filterGetByC_G_PrevAndNext(Session session, Task task,
+		long companyId, long groupId,
+		OrderByComparator<Task> orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			query = new StringBundler(5);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_TASK_WHERE);
+		}
+		else {
+			query.append(_FILTER_SQL_SELECT_TASK_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		query.append(_FINDER_COLUMN_C_G_COMPANYID_2);
+
+		query.append(_FINDER_COLUMN_C_G_GROUPID_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_TASK_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					query.append(_ORDER_BY_ENTITY_ALIAS);
+				}
+				else {
+					query.append(_ORDER_BY_ENTITY_TABLE);
+				}
+
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					query.append(_ORDER_BY_ENTITY_ALIAS);
+				}
+				else {
+					query.append(_ORDER_BY_ENTITY_TABLE);
+				}
+
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				query.append(TaskModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				query.append(TaskModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				Task.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN,
+				groupId);
+
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		if (getDB().isSupportsInlineDistinct()) {
+			q.addEntity(_FILTER_ENTITY_ALIAS, TaskImpl.class);
+		}
+		else {
+			q.addEntity(_FILTER_ENTITY_TABLE, TaskImpl.class);
+		}
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(companyId);
+
+		qPos.add(groupId);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(task);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<Task> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
 	 * Removes all the tasks where companyId = &#63; and groupId = &#63; from the database.
 	 *
 	 * @param companyId the company ID
@@ -1997,6 +2321,59 @@ public class TaskPersistenceImpl extends BasePersistenceImpl<Task>
 		}
 
 		return count.intValue();
+	}
+
+	/**
+	 * Returns the number of tasks that the user has permission to view where companyId = &#63; and groupId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param groupId the group ID
+	 * @return the number of matching tasks that the user has permission to view
+	 */
+	@Override
+	public int filterCountByC_G(long companyId, long groupId) {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return countByC_G(companyId, groupId);
+		}
+
+		StringBundler query = new StringBundler(3);
+
+		query.append(_FILTER_SQL_COUNT_TASK_WHERE);
+
+		query.append(_FINDER_COLUMN_C_G_COMPANYID_2);
+
+		query.append(_FINDER_COLUMN_C_G_GROUPID_2);
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				Task.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN,
+				groupId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(companyId);
+
+			qPos.add(groupId);
+
+			Long count = (Long)q.uniqueResult();
+
+			return count.intValue();
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
 	}
 
 	private static final String _FINDER_COLUMN_C_G_COMPANYID_2 = "task.companyId = ? AND ";
@@ -3578,6 +3955,342 @@ public class TaskPersistenceImpl extends BasePersistenceImpl<Task>
 	}
 
 	/**
+	 * Returns all the tasks that the user has permission to view where companyId = &#63; and groupId = &#63; and status = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param groupId the group ID
+	 * @param status the status
+	 * @return the matching tasks that the user has permission to view
+	 */
+	@Override
+	public List<Task> filterFindByC_G_S(long companyId, long groupId, int status) {
+		return filterFindByC_G_S(companyId, groupId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the tasks that the user has permission to view where companyId = &#63; and groupId = &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link TaskModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param groupId the group ID
+	 * @param status the status
+	 * @param start the lower bound of the range of tasks
+	 * @param end the upper bound of the range of tasks (not inclusive)
+	 * @return the range of matching tasks that the user has permission to view
+	 */
+	@Override
+	public List<Task> filterFindByC_G_S(long companyId, long groupId,
+		int status, int start, int end) {
+		return filterFindByC_G_S(companyId, groupId, status, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the tasks that the user has permissions to view where companyId = &#63; and groupId = &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link TaskModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param groupId the group ID
+	 * @param status the status
+	 * @param start the lower bound of the range of tasks
+	 * @param end the upper bound of the range of tasks (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching tasks that the user has permission to view
+	 */
+	@Override
+	public List<Task> filterFindByC_G_S(long companyId, long groupId,
+		int status, int start, int end,
+		OrderByComparator<Task> orderByComparator) {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return findByC_G_S(companyId, groupId, status, start, end,
+				orderByComparator);
+		}
+
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByFields().length * 2));
+		}
+		else {
+			query = new StringBundler(6);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_TASK_WHERE);
+		}
+		else {
+			query.append(_FILTER_SQL_SELECT_TASK_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		query.append(_FINDER_COLUMN_C_G_S_COMPANYID_2);
+
+		query.append(_FINDER_COLUMN_C_G_S_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_C_G_S_STATUS_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_TASK_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			if (getDB().isSupportsInlineDistinct()) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator, true);
+			}
+			else {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator, true);
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				query.append(TaskModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				query.append(TaskModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				Task.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN,
+				groupId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+
+			if (getDB().isSupportsInlineDistinct()) {
+				q.addEntity(_FILTER_ENTITY_ALIAS, TaskImpl.class);
+			}
+			else {
+				q.addEntity(_FILTER_ENTITY_TABLE, TaskImpl.class);
+			}
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(companyId);
+
+			qPos.add(groupId);
+
+			qPos.add(status);
+
+			return (List<Task>)QueryUtil.list(q, getDialect(), start, end);
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	/**
+	 * Returns the tasks before and after the current task in the ordered set of tasks that the user has permission to view where companyId = &#63; and groupId = &#63; and status = &#63;.
+	 *
+	 * @param taskId the primary key of the current task
+	 * @param companyId the company ID
+	 * @param groupId the group ID
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next task
+	 * @throws NoSuchTaskException if a task with the primary key could not be found
+	 */
+	@Override
+	public Task[] filterFindByC_G_S_PrevAndNext(long taskId, long companyId,
+		long groupId, int status, OrderByComparator<Task> orderByComparator)
+		throws NoSuchTaskException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return findByC_G_S_PrevAndNext(taskId, companyId, groupId, status,
+				orderByComparator);
+		}
+
+		Task task = findByPrimaryKey(taskId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Task[] array = new TaskImpl[3];
+
+			array[0] = filterGetByC_G_S_PrevAndNext(session, task, companyId,
+					groupId, status, orderByComparator, true);
+
+			array[1] = task;
+
+			array[2] = filterGetByC_G_S_PrevAndNext(session, task, companyId,
+					groupId, status, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected Task filterGetByC_G_S_PrevAndNext(Session session, Task task,
+		long companyId, long groupId, int status,
+		OrderByComparator<Task> orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			query = new StringBundler(6);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_TASK_WHERE);
+		}
+		else {
+			query.append(_FILTER_SQL_SELECT_TASK_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		query.append(_FINDER_COLUMN_C_G_S_COMPANYID_2);
+
+		query.append(_FINDER_COLUMN_C_G_S_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_C_G_S_STATUS_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_TASK_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					query.append(_ORDER_BY_ENTITY_ALIAS);
+				}
+				else {
+					query.append(_ORDER_BY_ENTITY_TABLE);
+				}
+
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					query.append(_ORDER_BY_ENTITY_ALIAS);
+				}
+				else {
+					query.append(_ORDER_BY_ENTITY_TABLE);
+				}
+
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				query.append(TaskModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				query.append(TaskModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				Task.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN,
+				groupId);
+
+		SQLQuery q = session.createSynchronizedSQLQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		if (getDB().isSupportsInlineDistinct()) {
+			q.addEntity(_FILTER_ENTITY_ALIAS, TaskImpl.class);
+		}
+		else {
+			q.addEntity(_FILTER_ENTITY_TABLE, TaskImpl.class);
+		}
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(companyId);
+
+		qPos.add(groupId);
+
+		qPos.add(status);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(task);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<Task> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
 	 * Removes all the tasks where companyId = &#63; and groupId = &#63; and status = &#63; from the database.
 	 *
 	 * @param companyId the company ID
@@ -3651,6 +4364,64 @@ public class TaskPersistenceImpl extends BasePersistenceImpl<Task>
 		}
 
 		return count.intValue();
+	}
+
+	/**
+	 * Returns the number of tasks that the user has permission to view where companyId = &#63; and groupId = &#63; and status = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param groupId the group ID
+	 * @param status the status
+	 * @return the number of matching tasks that the user has permission to view
+	 */
+	@Override
+	public int filterCountByC_G_S(long companyId, long groupId, int status) {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return countByC_G_S(companyId, groupId, status);
+		}
+
+		StringBundler query = new StringBundler(4);
+
+		query.append(_FILTER_SQL_COUNT_TASK_WHERE);
+
+		query.append(_FINDER_COLUMN_C_G_S_COMPANYID_2);
+
+		query.append(_FINDER_COLUMN_C_G_S_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_C_G_S_STATUS_2);
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				Task.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN,
+				groupId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(companyId);
+
+			qPos.add(groupId);
+
+			qPos.add(status);
+
+			Long count = (Long)q.uniqueResult();
+
+			return count.intValue();
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
 	}
 
 	private static final String _FINDER_COLUMN_C_G_S_COMPANYID_2 = "task.companyId = ? AND ";
@@ -4529,7 +5300,17 @@ public class TaskPersistenceImpl extends BasePersistenceImpl<Task>
 	private static final String _SQL_SELECT_TASK_WHERE = "SELECT task FROM Task task WHERE ";
 	private static final String _SQL_COUNT_TASK = "SELECT COUNT(task) FROM Task task";
 	private static final String _SQL_COUNT_TASK_WHERE = "SELECT COUNT(task) FROM Task task WHERE ";
+	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "task.taskId";
+	private static final String _FILTER_SQL_SELECT_TASK_WHERE = "SELECT DISTINCT {task.*} FROM ABT_Task task WHERE ";
+	private static final String _FILTER_SQL_SELECT_TASK_NO_INLINE_DISTINCT_WHERE_1 =
+		"SELECT {ABT_Task.*} FROM (SELECT DISTINCT task.taskId FROM ABT_Task task WHERE ";
+	private static final String _FILTER_SQL_SELECT_TASK_NO_INLINE_DISTINCT_WHERE_2 =
+		") TEMP_TABLE INNER JOIN ABT_Task ON TEMP_TABLE.taskId = ABT_Task.taskId";
+	private static final String _FILTER_SQL_COUNT_TASK_WHERE = "SELECT COUNT(DISTINCT task.taskId) AS COUNT_VALUE FROM ABT_Task task WHERE ";
+	private static final String _FILTER_ENTITY_ALIAS = "task";
+	private static final String _FILTER_ENTITY_TABLE = "ABT_Task";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "task.";
+	private static final String _ORDER_BY_ENTITY_TABLE = "ABT_Task.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Task exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Task exists with the key {";
 	private static final Log _log = LogFactoryUtil.getLog(TaskPersistenceImpl.class);

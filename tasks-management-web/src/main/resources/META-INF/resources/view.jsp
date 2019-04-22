@@ -1,14 +1,34 @@
 <%@ include file="init.jsp" %>
 
-<aui:button-row>
+<%
+boolean showAddTaskButton = TaskResourcePermissionChecker.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_TASK);
+boolean showPermissionsButton = TaskResourcePermissionChecker.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
+%>
+
+<c:if test="<%= showAddTaskButton || showPermissionsButton %>">
+	<aui:button-row>
+		<c:if test="<%= showAddTaskButton %>">
 			<liferay-portlet:renderURL var="addTaskURL">
 				<liferay-portlet:param name="mvcPath" value="/edit_task.jsp" />
 				<liferay-portlet:param name="redirect" value="<%= currentURL %>" />
 			</liferay-portlet:renderURL>
 
-<aui:button href="<%= addTaskURL %>" icon="icon-plus" value="add-task" />
-		
+			<aui:button href="<%= addTaskURL %>" icon="icon-plus" value="add-task" />
+		</c:if>
+
+		<c:if test="<%= showPermissionsButton %>">
+			<liferay-security:permissionsURL
+				modelResource="gr.confinanz.tasks.management"
+				modelResourceDescription="<%= HtmlUtil.escape(themeDisplay.getScopeGroupName()) %>"
+				resourcePrimKey="<%= String.valueOf(scopeGroupId) %>"
+				var="permissionsURL"
+				windowState="<%= LiferayWindowState.POP_UP.toString() %>"
+			/>
+
+			<aui:button href="<%= permissionsURL %>" useDialog="<%= true %>" value="permissions" />
+		</c:if>
 	</aui:button-row>
+</c:if>
 	
 <liferay-ui:success key="taskAdded" message="task-added" />
 <liferay-ui:success key="taskUpdated" message="task-updated" />

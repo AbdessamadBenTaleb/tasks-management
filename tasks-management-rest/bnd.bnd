@@ -1,0 +1,4 @@
+Bundle-Name: tasks-management-rest
+Bundle-SymbolicName: gr.confinanz.tasks.management.rest
+Bundle-Version: 1.0.0
+Liferay-Configuration-Path: /configuration
